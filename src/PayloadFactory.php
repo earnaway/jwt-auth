@@ -182,7 +182,7 @@ class PayloadFactory
         $sub = array_get($this->claims, 'sub', '');
         $nbf = array_get($this->claims, 'nbf', '');
 
-        return md5(sprintf('jti.%s.%s', $sub, $nbf));
+        return md5(sprintf('jti.%s.%s.%d', $sub, $nbf, mt_rand(1000, 100000)));
     }
 
     /**
