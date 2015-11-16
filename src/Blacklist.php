@@ -58,9 +58,19 @@ class Blacklist
 
         // find the number of minutes until the expiration date, plus 1 minute to avoid overlap
         $minutes = $lastExp->diffInMinutes(Utils::now()->subMinute());
+
+        // get the valid until timestamp
+        $validUntil = $this->getGraceTimestamp();
+
+        // if there is already a valid until timestamp for this jti key, then use that one instead
+        if ($keyinCache = $this->storage->get($payload['jti'])) {
+            $validUntil = $keyinCache['valid_until'];
+        }
+
+        // add this jti key to the storage cache
         $this->storage->add(
             $payload['jti'],
-            ['valid_until' => $this->getGraceTimestamp()],
+            ['valid_until' => $validUntil],
             $minutes
         );
 
