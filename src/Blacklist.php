@@ -16,7 +16,7 @@ use Tymon\JWTAuth\Providers\Storage\StorageInterface;
 class Blacklist
 {
     /**
-     * @var StorageInterface
+     * @var \Tymon\JWTAuth\Providers\Storage\StorageInterface
      */
     protected $storage;
 
@@ -35,7 +35,7 @@ class Blacklist
     protected $refreshTTL = 20160;
 
     /**
-     * @param StorageInterface  $storage
+     * @param \Tymon\JWTAuth\Providers\Storage\StorageInterface  $storage
      *
      */
     public function __construct(StorageInterface $storage)
@@ -145,14 +145,15 @@ class Blacklist
     }
 
     /**
-     * Set the refresh time limit
+     * Set the refresh time limit.
      *
      * @param  integer
-     * @return Blacklist
+     * @return $this
      */
     public function setRefreshTTL($ttl)
     {
         $this->refreshTTL = (int) $ttl;
+
         return $this;
     }
 }
