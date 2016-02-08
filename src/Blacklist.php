@@ -36,7 +36,6 @@ class Blacklist
 
     /**
      * @param \Tymon\JWTAuth\Providers\Storage\StorageInterface  $storage
-     *
      */
     public function __construct(StorageInterface $storage)
     {
@@ -122,6 +121,19 @@ class Blacklist
     }
 
     /**
+     * Set the refresh time limit.
+     *
+     * @param  integer
+     * @return $this
+     */
+    public function setRefreshTTL($ttl)
+    {
+        $this->refreshTTL = (int) $ttl;
+
+        return $this;
+    }
+
+    /**
      * Get the timestamp when the blacklist comes into effect
      * This defaults to immediate (0 seconds)
      *
@@ -141,19 +153,6 @@ class Blacklist
     public function setGracePeriod($gracePeriod)
     {
         $this->gracePeriod = (int) $gracePeriod;
-        return $this;
-    }
-
-    /**
-     * Set the refresh time limit.
-     *
-     * @param  integer
-     * @return $this
-     */
-    public function setRefreshTTL($ttl)
-    {
-        $this->refreshTTL = (int) $ttl;
-
         return $this;
     }
 }
