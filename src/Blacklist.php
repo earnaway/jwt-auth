@@ -21,7 +21,7 @@ class Blacklist
     protected $storage;
 
     /**
-     * The grace period when a token is blacklisted. In seconds
+     * The grace period (in seconds) when a token is blacklisted.
      *
      * @var integer
      */
@@ -138,7 +138,7 @@ class Blacklist
 
     /**
      * Get the timestamp when the blacklist comes into effect
-     * This defaults to immediate (0 seconds)
+     * This defaults to immediate (0 seconds).
      *
      * @return integer
      */
@@ -148,7 +148,7 @@ class Blacklist
     }
 
     /**
-     * Set the grace period
+     * Set the grace period.
      *
      * @param  integer
      * @return Blacklist
