@@ -1,12 +1,14 @@
 <?php
+
 /*
- * This file is part of jwt-auth
+ * This file is part of jwt-auth.
  *
  * (c) Sean Tymon <tymon148@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Tymon\JWTAuth;
 
 use Tymon\JWTAuth\Providers\Storage\StorageInterface;
@@ -28,7 +30,7 @@ class Blacklist
     /**
      * Number of minutes from issue date in which a JWT can be refreshed.
      *
-     * @var integer
+     * @var int
      */
     protected $refreshTTL = 20160;
 
@@ -42,25 +44,29 @@ class Blacklist
     }
 
     /**
-     * Add the token (jti claim) to the blacklist
+     * Add the token (jti claim) to the blacklist.
      *
      * @param  \Tymon\JWTAuth\Payload  $payload
-     *
-     * @return boolean
+     * @return bool
      */
     public function add(Payload $payload)
     {
         $exp = Utils::timestamp($payload['exp']);
         $refreshExp = Utils::timestamp($payload['iat'])->addMinutes($this->refreshTTL);
 
-        // get the later of the two expiration dates
-        $lastExp = $exp->max($refreshExp);
+        // there is no need to add the token to the blacklist
+        // if the token has already expired AND the refresh_ttl
+        // has gone by
+        if ($exp->isPast() && $refreshExp->isPast()) {
+            return false;
+        }
 
-        // find the number of minutes until the expiration date, plus 1 minute to avoid overlap
-        $minutes = $lastExp->diffInMinutes(Utils::now()->subMinute());
+        // Set the cache entry's lifetime to be equal to the amount
+        // of refreshable time it has remaining (which is the larger
+        // of `exp` and `iat+refresh_ttl`), rounded up a minute
+        $cacheLifetime = $exp->max($refreshExp)->addMinute()->diffInMinutes();
 
-        // get the valid until timestamp
-        $validUntil = $this->getGraceTimestamp();
+        $this->storage->add($payload['jti'], [], $cacheLifetime);
 
         // if there is already a valid until timestamp for this jti key, then use that one instead
         if ($keyinCache = $this->storage->get($payload['jti'])) {
@@ -71,17 +77,17 @@ class Blacklist
         $this->storage->add(
             $payload['jti'],
             ['valid_until' => $validUntil],
-            $minutes
+            $cacheLifetime
         );
 
         return true;
     }
 
     /**
-     * Determine whether the token has been blacklisted
+     * Determine whether the token has been blacklisted.
      *
      * @param  \Tymon\JWTAuth\Payload  $payload
-     * @return boolean
+     * @return bool
      */
     public function has(Payload $payload)
     {
@@ -94,10 +100,10 @@ class Blacklist
     }
 
     /**
-     * Remove the token (jti claim) from the blacklist
+     * Remove the token (jti claim) from the blacklist.
      *
      * @param  \Tymon\JWTAuth\Payload  $payload
-     * @return boolean
+     * @return bool
      */
     public function remove(Payload $payload)
     {
@@ -105,9 +111,9 @@ class Blacklist
     }
 
     /**
-     * Remove all tokens from the blacklist
+     * Remove all tokens from the blacklist.
      *
-     * @return boolean
+     * @return bool
      */
     public function clear()
     {
