@@ -91,10 +91,12 @@ class Blacklist
     public function has(Payload $payload)
     {
         $grace = $this->storage->get($payload['jti']);
+
         // check whether the expiry + grace has past
         if (is_null($grace) || Utils::timestamp($grace['valid_until'])->isFuture()) {
             return false;
         }
+
         return true;
     }
 
@@ -117,13 +119,14 @@ class Blacklist
     public function clear()
     {
         $this->storage->flush();
+
         return true;
     }
 
     /**
      * Set the refresh time limit.
      *
-     * @param  integer
+     * @param  int
      * @return $this
      */
     public function setRefreshTTL($ttl)
