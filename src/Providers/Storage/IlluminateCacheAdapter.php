@@ -58,6 +58,17 @@ class IlluminateCacheAdapter implements StorageInterface
     }
 
     /**
+     * Get an item from storage.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return $this->cache()->get($key);
+    }
+
+    /**
      * Remove an item from storage.
      *
      * @param  string  $key
